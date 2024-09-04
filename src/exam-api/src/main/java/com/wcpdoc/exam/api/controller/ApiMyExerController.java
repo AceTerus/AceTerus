@@ -189,24 +189,32 @@ public class ApiMyExerController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/questionList")
-	public PageResult questionList(Integer exerId) {
+	public PageResult questionList(Integer exerId[]) {
 		try {
 			// 数据有效性校验
-			Exer exer = exerService.getById(exerId);
-			if (exer.getState() == 0) {
-				throw new MyException("练习已删除");
-			}
-			long curTime = System.currentTimeMillis();
-			if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
-				throw new MyException("时间已过期");
-			}
-			if (!exer.getUserIds().contains(getCurUser().getId())) {
-				throw new MyException("无权限");
-			}
-			
-			// 试题列表
-			List<Integer> questionIds = questionService.getIds(exer.getQuestionTypeId());
-			return PageResultEx.ok().data(questionIds);
+            //
+            List<Integer> questionIds = new ArrayList<>();
+            //log.error("exerid: {}", exerId.toString());
+            for(Integer exeridin : exerId){
+                //log.error("no: {}", String.valueOf(exeridin));
+                Exer exer = exerService.getById(exeridin);
+                if (exer.getState() == 0) {
+                    throw new MyException("练习已删除");
+                }
+                long curTime = System.currentTimeMillis();
+                //if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
+                    //throw new MyException("时间已过期");
+                //}
+                if (!exer.getUserIds().contains(getCurUser().getId())) {
+                    throw new MyException("无权限");
+                }
+                
+                // 试题列表
+                questionIds.addAll(questionService.getIds(exer.getQuestionTypeId()));
+                //log.error("one: {}", questionService.getIds(exer.getQuestionTypeId()).toString());
+            }
+            //log.error("all: {}", questionIds.toString());
+            return PageResultEx.ok().data(questionIds);
 		} catch (MyException e) {
 			log.error("我的练习试题列表错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
