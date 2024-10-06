@@ -83,7 +83,7 @@ public class ApiExamController extends BaseController {
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
 		try {
-			if (CurLoginUserUtil.isAdmin()) {// 管理员看所有
+			/* if (CurLoginUserUtil.isAdmin()) {// 管理员看所有
 
 			} else if (CurLoginUserUtil.isSubAdmin()) {// 子管理员看自己
 				pageIn.addParm("subAdminUserId", getCurUser().getId());
@@ -91,7 +91,7 @@ public class ApiExamController extends BaseController {
 				pageIn.addParm("markUserId", getCurUser().getId());
 			} else if (CurLoginUserUtil.isExamUser()) {// 考试用户没有权限
 				throw new MyException("无权限");
-			}
+			} */
 
 			PageOut pageOut = examService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
@@ -490,4 +490,21 @@ public class ApiExamController extends BaseController {
 			return PageResult.err();
 		}
 	}
+
+	@RequestMapping("/addUser")
+	public PageResult addUser(Integer examId) {
+		try {
+            List<Integer> userIds = new ArrayList<>();
+            userIds.add(getCurUser().getId());
+            List<Integer> examIds = examService.userAdd(examId, userIds);
+			// List<Map<String, Object>> resultList = new ArrayList<>();
+            Map<String, Object> result = new HashMap<>();
+            result.put("examIds", examIds);
+            // resultList.add(result);
+			return PageResultEx.ok().data(result);
+        } catch (Exception e) {
+			log.error("Assigning User to MyExam：", e);
+			return PageResult.err();
+		}
+    }
 }

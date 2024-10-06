@@ -82,7 +82,7 @@ public interface ExamService extends BaseService<Exam> {
 	 * @param examUserIds 考试用户IDS
 	 * @param markUserIds 阅卷用户IDS void
 	 */
-	void userAdd(Integer id, String[] examUserIds, Integer[] markUserIds);
+	List<Integer> userAdd(Integer id, List<Integer> examUserIds);
 
 	/**
 	 * 阅卷协助

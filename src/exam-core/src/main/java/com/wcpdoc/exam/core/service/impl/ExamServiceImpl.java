@@ -200,10 +200,76 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		return exam;
 	}
 
-	@Override
-	public void userAdd(Integer id, String[] examUserIds, Integer[] markUserIds) {
+    @Override
+    public List<Integer> userAdd(Integer examId, List<Integer> examUserIds) {
+        Map<Integer, List<QuestionOption>> questionOptionCache = new HashMap<>();
+        Map<Integer, List<QuestionAnswer>> questionAnswerCache = new HashMap<>();
 
-	}
+        myExamService.clear(examId);
+		myQuestionService.clear(examId);
+        // Question question = examCacheService.getQuestion(examId);
+        Exam exam = examCacheService.getExam(examId);
+        List<ExamQuestion> examQuestionList = examQuestionService.getList(examId); // Call getList() on the instance
+        List<Integer> myExamIds = new ArrayList<>();
+
+        for (Integer examUserId : examUserIds) {
+            MyExam myExam = new MyExam(); // 生成我的考试信息
+            myExam.setExamId(exam.getId());
+            myExam.setUserId(examUserId);
+            // myExam.setMarkUserId(1); //由管理员、子管理员或阅卷用户自己领取自己分配
+            myExam.setState(1); // 未考试
+            myExam.setMarkState(1); // 未阅卷
+            myExam.setUpdateTime(new Date());
+            myExam.setUpdateUserId(getCurUser().getId());
+            myExamService.save(myExam);
+
+            myExamIds.add(myExam.getId());
+
+            int no = 1;
+            for (ExamQuestion examQuestion : examQuestionList) {
+                MyQuestion myQuestion = new MyQuestion();
+                myQuestion.setChapterName(examQuestion.getChapterName());
+                myQuestion.setChapterTxt(examQuestion.getChapterTxt());
+                myQuestion.setType(examQuestion.getType());
+                myQuestion.setScore(examQuestion.getScore());
+                myQuestion.setScores(examQuestion.getScores());
+                myQuestion.setMarkOptions(examQuestion.getMarkOptions());
+                myQuestion.setExamId(examQuestion.getExamId());
+                myQuestion.setQuestionId(examQuestion.getQuestionId());
+                myQuestion.setUserId(examUserId);
+                myQuestion.setNo(no++);
+                myQuestion.setUpdateUserId(getCurUser().getId());
+                myQuestion.setUpdateTime(new Date());
+                myQuestionService.save(myQuestion);
+
+                // Handle question shuffling (if needed)
+                // if (ExamUtil.hasQuestionRand(examInfo)) {
+                //     shuffleCacheList.add(myQuestion);
+                //     if (ExamUtil.hasChapter(myQuestion) || i >= examQuestions.size() - 1) {
+                //         Collections.shuffle(shuffleCacheList);
+                //         Integer maxNo = ExamUtil.hasChapter(myQuestion) ? myQuestion.getNo() - 1 : myQuestion.getNo();
+                //         for (MyQuestion shuffleCache : shuffleCacheList) {
+                //             shuffleCache.setNo(maxNo--);
+                //             myQuestionService.updateById(shuffleCache);
+                //         }
+                //         shuffleCacheList.clear();
+                //     }
+                // }
+
+                // Handle option shuffling (if needed)
+                // if (ExamUtil.hasOptionRand(examInfo)) {
+                //     if (questionOptionCache.get(myQuestion.getQuestionId()) == null) {
+                //         questionOptionCache.put(myQuestion.getQuestionId(),
+                //                 examCacheService.getQuestionOptionList(myQuestion.getQuestionId()));
+                //     }
+                //     List<QuestionOption> questionOptionList = questionOptionCache.get(myQuestion.getQuestionId());
+                //     myQuestion.setOptionsNo(shuffleNums(1, questionOptionList.size()));
+                //     myQuestionService.updateById(myQuestion);
+                // }
+            }
+        }
+        return myExamIds;
+    }
 
 	@Override
 	public void assist(Integer id, Integer[] markUserIds) {
