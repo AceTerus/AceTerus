@@ -69,8 +69,8 @@ public class ShiroCfg {
 		filterChainMap.put("/api/questionType/*", "jwt,anyRolesEx[0,2]");// 题库
 		filterChainMap.put("/api/question/*", "jwt,anyRolesEx[0,2]");// 题库
 		filterChainMap.put("/api/exer/*", "jwt,anyRolesEx[0,2]");// 练习
-		filterChainMap.put("/api/exam/get", "jwt,anyRolesEx[0,2,3]");// 考试详情
-		filterChainMap.put("/api/exam/*", "jwt,anyRolesEx[0,2]");// 考试
+		filterChainMap.put("/api/exam/get", "jwt,anyRolesEx[0,1,2,3]");// 考试详情
+		filterChainMap.put("/api/exam/*", "jwt,anyRolesEx[0,1,2]");// 考试
 		filterChainMap.put("/api/myMark/*", "jwt,anyRolesEx[0,2,3]");// 我的阅卷（管理员、子管理员、阅卷用户都有权限，只是数据权限不一样）
 		filterChainMap.put("/api/report/subAdmin/home", "jwt,anyRolesEx[2]");// 考试
 		filterChainMap.put("/api/report/exam/rankListpage", "jwt,anyRolesEx[0,2]");// 报表相关
