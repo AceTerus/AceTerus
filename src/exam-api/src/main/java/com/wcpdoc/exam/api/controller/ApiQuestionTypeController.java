@@ -42,9 +42,9 @@ public class ApiQuestionTypeController extends BaseController {
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
 		try {
-			if (!CurLoginUserUtil.isAdmin()) {// 考试用户、阅卷用户没有权限；子管理员看自己；管理员看所有；
-				pageIn.addParm("curUserId", getCurUser().getId());
-			}
+			// if (!CurLoginUserUtil.isAdmin()) {// 考试用户、阅卷用户没有权限；子管理员看自己；管理员看所有；
+			// 	pageIn.addParm("curUserId", getCurUser().getId());
+			// }
 			PageOut pageOut = questionTypeService.getListpage(pageIn);
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {

@@ -115,20 +115,20 @@ public class ApiMyExerController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/question")
-	public PageResult question(Integer exerId, Integer questionId) {
+	public PageResult question(Integer questionId) {
 		try {
 			// 数据校验
-			Exer exer = exerService.getById(exerId);
-			if (exer.getState() == 0) {
-				throw new MyException("已删除");
-			}
-			long curTime = System.currentTimeMillis();
-			if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
-				throw new MyException("时间已过期");
-			}
-			if (ValidateUtil.isValid(exer.getUserIds()) && !exer.getUserIds().contains(getCurUser().getId())) {
-				throw new MyException("无权限");
-			}
+			// Exer exer = exerService.getById(exerId);
+			// if (exer.getState() == 0) {
+			// 	throw new MyException("已删除");
+			// }
+			// long curTime = System.currentTimeMillis();
+			// if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
+			// 	throw new MyException("时间已过期");
+			// }
+			// if (ValidateUtil.isValid(exer.getUserIds()) && !exer.getUserIds().contains(getCurUser().getId())) {
+			// 	throw new MyException("无权限");
+			// }
 			
 			// 试题获取
 			Map<String, Object> questionMap = new HashMap<>();
@@ -197,20 +197,20 @@ public class ApiMyExerController extends BaseController {
             //log.error("exerid: {}", exerId.toString());
             for(Integer exeridin : exerId){
                 //log.error("no: {}", String.valueOf(exeridin));
-                Exer exer = exerService.getById(exeridin);
-                if (exer.getState() == 0) {
-                    throw new MyException("练习已删除");
-                }
-                long curTime = System.currentTimeMillis();
+                // Exer exer = exerService.getById(exeridin);
+                // if (exer.getState() == 0) {
+                //     throw new MyException("练习已删除");
+                // }
+                // long curTime = System.currentTimeMillis();
                 //if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
                     //throw new MyException("时间已过期");
                 //}
-                if (!exer.getUserIds().contains(getCurUser().getId())) {
-                    throw new MyException("无权限");
-                }
+                // if (!exer.getUserIds().contains(getCurUser().getId())) {
+                //     throw new MyException("无权限");
+                // }
                 
                 // 试题列表
-                questionIds.addAll(questionService.getIds(exer.getQuestionTypeId()));
+                questionIds.addAll(questionService.getIds(exeridin));
                 //log.error("one: {}", questionService.getIds(exer.getQuestionTypeId()).toString());
             }
             //log.error("all: {}", questionIds.toString());
