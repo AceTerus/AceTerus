@@ -1,1 +1,0 @@
-INSERT INTO SYS_VER VALUES (33, '4.3.1', '2023-11-13 17:35:00', 'zhanghc', '');
