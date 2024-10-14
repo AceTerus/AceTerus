@@ -20,6 +20,9 @@ public interface UserService extends BaseService<User> {
 	 */
 	void addEx(User user);
 
+	void register(User user);
+
+
 	/**
 	 * 用户修改
 	 * 

@@ -1,5 +1,7 @@
 package com.wcpdoc.base.service.impl;
 
+import java.util.regex.Pattern;
+
 import java.util.Date;
 import java.util.List;
 
@@ -41,30 +43,65 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		return userDao;
 	}
 
+    @Override
+    public void addEx(User user) {
+        // 数据校验
+        addValid(user);
+
+        // 用户添加
+        Date curTime = new Date();
+        user.setRegistTime(curTime);
+        user.setUpdateTime(curTime);
+        user.setUpdateUserId(getCurUser().getId());
+        user.setState(1);
+        if (getCurUser().getType() == 0 && user.getType() == 1) {// 如果是管理员添加考试用户
+            user.setOrgId(ValidateUtil.isValid(user.getOrgId()) ? user.getOrgId() : 1);// 页面没选机构，默认根机构
+            user.setParentId(getCurUser().getId());// 考试用户归管理员管
+        } else if (getCurUser().getType() == 0 && user.getType() == 2) {// 如果是管理员添加子管理员
+            user.setOrgId(0);// 不属于任何机构
+            user.setParentId(getCurUser().getId());// 子管理员归管理员管
+        } else if (getCurUser().getType() == 0 && user.getType() == 3) {// 如果是管理员添加阅卷用户
+            user.setOrgId(0);// 不属于任何机构
+            user.setParentId(getCurUser().getId());// 阅卷用户归管理员管
+        } else if (getCurUser().getType() == 2) {// 如果是子管理员添加阅卷用户
+            user.setOrgId(0);// 不属于任何机构
+            user.setParentId(getCurUser().getId());// 阅卷用户归子管理员管
+        }
+        save(user);
+    }
+
+
+
 	@Override
-	public void addEx(User user) {
+	public void register(User user) {
 		// 数据校验
-		addValid(user);
+		// addValid(user);
 
 		// 用户添加
 		Date curTime = new Date();
 		user.setRegistTime(curTime);
 		user.setUpdateTime(curTime);
-		user.setUpdateUserId(getCurUser().getId());
+		// user.setUpdateUserId(getCurUser().getId());
 		user.setState(1);
-		if (getCurUser().getType() == 0 && user.getType() == 1) {// 如果是管理员添加考试用户
-			user.setOrgId(ValidateUtil.isValid(user.getOrgId()) ? user.getOrgId() : 1);// 页面没选机构，默认根机构
-			user.setParentId(getCurUser().getId());// 考试用户归管理员管
-		} else if (getCurUser().getType() == 0 && user.getType() == 2) {// 如果是管理员添加子管理员
-			user.setOrgId(0);// 不属于任何机构
-			user.setParentId(getCurUser().getId());// 子管理员归管理员管
-		} else if (getCurUser().getType() == 0 && user.getType() == 3) {// 如果是管理员添加阅卷用户
-			user.setOrgId(0);// 不属于任何机构
-			user.setParentId(getCurUser().getId());// 阅卷用户归管理员管
-		} else if (getCurUser().getType() == 2) {// 如果是子管理员添加阅卷用户
-			user.setOrgId(0);// 不属于任何机构
-			user.setParentId(getCurUser().getId());// 阅卷用户归子管理员管
+		user.setType(1); // user
+        //
+		if (userDao.existLoginName(user.getLoginName(), user.getId())) {
+			throw new MyException("Username already exist");
 		}
+
+        // if (!emailValid(user.getEmail())) {
+            // throw new MyException(user.getLoginName());
+            // throw new MyException(user.getEmail());
+            // throw new MyException("Please insert a valid email.");
+        // }
+        if (!ValidateUtil.isValid(user.getPwd())) {
+        //     // throw new MyException(user.getLoginName());
+        //     // throw new MyException(user.getEmail());
+            throw new MyException("Password is not valid");
+        }
+
+        user.setPwd(getEncryptPwd(user.getLoginName(), user.getPwd()));// 初始化密码
+
 		save(user);
 	}
 
@@ -190,12 +227,12 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		// 当前用户是管理员，不能直接添加阅卷用户
 		// throw new MyException("管理员不能直接添加阅卷用户");// 相对简单不启动子管理的情况下，管理员也能添加
 		// }
-		if (getCurUser().getType() == 1 || getCurUser().getType() == 3) {// 当前用户是考试用户或阅卷用户，不能添加用户
-			throw new MyException("无权限");
-		}
-		if (getCurUser().getType() == 2 && user.getType() != 3) {// 当前用户是子管理员，只能添加阅卷用户
-			throw new MyException("子管理员只能添加阅卷用户");
-		}
+		// if (getCurUser().getType() == 1 || getCurUser().getType() == 3) {// 当前用户是考试用户或阅卷用户，不能添加用户
+		// 	throw new MyException("无权限");
+		// }
+		// if (getCurUser().getType() == 2 && user.getType() != 3) {// 当前用户是子管理员，只能添加阅卷用户
+		// 	throw new MyException("子管理员只能添加阅卷用户");
+		// }
 		if (getCurUser().getType() != 0) { // 不是管理员，设置管理用户或机构无效
 			if (ValidateUtil.isValid(user.getOrgIds())) {
 				throw new MyException("非管理员，设置管理用户无效");
@@ -270,6 +307,18 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 			throw new MyException("参数错误：id");
 		}
 	}
+
+
+    private boolean emailValid(String emailAddress) {
+        if (emailAddress == null) {
+            return false; // or handle accordingly (e.g., throw an exception)
+        }
+        // String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@" 
+        // RFC 5322
+        String regexPattern = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+            // + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+        return Pattern.matches(regexPattern, emailAddress);
+    }
 
 	private void pwdValid(Integer id) {
 		if (!ValidateUtil.isValid(id)) {

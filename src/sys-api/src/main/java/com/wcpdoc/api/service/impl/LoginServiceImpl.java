@@ -64,10 +64,10 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 
 		User user = userService.getUser(loginName);
 		if (user == null || !user.getPwd().equals(userService.getEncryptPwd(loginName, pwd))) {
-			throw new LoginException("用户名或密码错误");
+			throw new LoginException("Incorrect username or password");
 		}
 		if (user.getState() == 2) {
-			throw new LoginException("账号已被冻结");
+			throw new LoginException("Please verify your email");
 		}
 
 		// 生成令牌（登陆由shiro接收令牌控制）
