@@ -111,6 +111,23 @@ public class ApiUserController extends BaseController {
 		}
 	}
 
+
+	@RequestMapping("/register")
+	public PageResult register(User user) {
+		try {
+			// 用户添加
+			userService.register(user);
+			Map<String, Object> data = new HashMap<String, Object>();
+			data.put("LoginName", user.getLoginName());
+			return PageResultEx.ok().data(data);
+		} catch (MyException e) {
+			log.error("Register：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("Register：", e);
+			return PageResult.err();
+		}
+	}
 	/**
 	 * 用户修改
 	 * 
