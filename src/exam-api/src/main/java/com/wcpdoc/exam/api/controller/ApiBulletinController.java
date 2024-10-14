@@ -43,7 +43,7 @@ public class ApiBulletinController extends BaseController {
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
 		try {
-			pageIn.addParm("curUserId", getCurUser().getId());
+			// pageIn.addParm("curUserId", getCurUser().getId());
 			return PageResultEx.ok().data(bulletinService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("公告列表错误：", e);

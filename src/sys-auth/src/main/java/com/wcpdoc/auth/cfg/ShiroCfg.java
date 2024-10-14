@@ -84,8 +84,18 @@ public class ShiroCfg {
 		// 阅卷用户权限
 		filterChainMap.put("/api/report/markUser/home", "jwt,anyRolesEx[3]");// 阅卷用户首页
 
+
+        // added
+        filterChainMap.put("/api/user/register", "anon");// 考试详情
+        filterChainMap.put("/api/exam/*", "anon");// 考试详情
+        filterChainMap.put("/api/questionType/*", "anon");// 考试详情
+
 		// 管理员权限
 		filterChainMap.put("/api/**", "jwt,anyRolesEx[0]");// 剩余都是
+        //
+        //
+        //
+
 		shiroFilterFactory.setFilterChainDefinitionMap(filterChainMap);
 		return shiroFilterFactory;
 	}
