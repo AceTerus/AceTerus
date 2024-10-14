@@ -94,7 +94,7 @@ public class ExamCoreRunner implements ApplicationRunner {
 		new Thread(() -> {
 			while (true) {
 				try {
-					TimeUnit.SECONDS.sleep(1);
+					TimeUnit.SECONDS.sleep(100);
 
 					Long curTime = System.currentTimeMillis();
 					List<Callable<Boolean>> taskList = examCacheService.getExamingList().stream()//

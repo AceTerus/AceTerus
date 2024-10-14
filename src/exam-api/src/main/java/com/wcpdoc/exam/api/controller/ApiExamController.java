@@ -494,6 +494,9 @@ public class ApiExamController extends BaseController {
 	@RequestMapping("/addUser")
 	public PageResult addUser(Integer examId) {
 		try {
+			if (!CurLoginUserUtil.isExamUser()) {
+				throw new MyException("User not login-ed");
+			}
             List<Integer> userIds = new ArrayList<>();
             userIds.add(getCurUser().getId());
             List<Integer> examIds = examService.userAdd(examId, userIds);

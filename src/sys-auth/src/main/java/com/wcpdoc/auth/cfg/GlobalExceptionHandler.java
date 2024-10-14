@@ -37,10 +37,10 @@ public class GlobalExceptionHandler {
 		}
 
 		if (se instanceof UnauthorizedException) {
-			return PageResult.err().code(HttpStatus.UNAUTHORIZED.value()).msg("无访问权限");
+			return PageResult.err().code(HttpStatus.UNAUTHORIZED.value()).msg("You have no permission");
 		}
 		if (se instanceof UnauthenticatedException) {
-			return PageResult.err().code(HttpStatus.UNAUTHORIZED.value()).msg("未登陆");
+			return PageResult.err().code(HttpStatus.UNAUTHORIZED.value()).msg("Please login");
 		}
 
 		log.error("shiro未捕获异常：{}", se.getMessage());

@@ -68,4 +68,5 @@ public class ExamQuestionEx extends ExamQuestion {
 	public void setAnswers(List<String> answers) {
 		this.answers = answers;
 	}
+
 }
